@@ -103,7 +103,7 @@ def plotcmd(t, cpath, blue='f475w', red='f814w', y='f814w'):
                          ax = ax, threshold=100, log_counts=False,
                          plot_args={'color':'k', 'alpha':0.2},
                          histogram2d_args={'bins':40},
-                         contour_args={'cmap':'viridis'})
+                         contour_args={'cmap':'viridis', 'zorder':100})
     levels = sc[-1].levels
     labels = ['{:.0f}'.format(l) for l in levels]
     cb = fig.colorbar(sc[-1], label='Star density')
