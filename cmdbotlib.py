@@ -1,3 +1,4 @@
+from __future__ import division
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.path as mplPath
@@ -15,16 +16,13 @@ def check_new_tweet(status_id, recentfile='most_recent.txt'):
         with open(recentfile) as f:
             prev_id = f.read()
         if status_id == prev_id:
-            print('No new @AndromedaBot tweets found.')
             new_tweet = False
         elif status_id != prev_id:
-            print('New @AndromedaBot tweet found!')
             new_tweet = True
             with open(recentfile,'w') as f:
                 f.write(status_id)
     else:
         new_tweet = True
-        print('New @AndromedaBot tweet found!')
         with open(recentfile,'w') as f:
             f.write(status_id)
     return new_tweet
@@ -38,7 +36,6 @@ def get_pix(pxstr):
     c1 = pxstr.split(': ')[1].split('. ')
     xc,yc = map(float, c1[0].split(','))
     w,h = map(float, [c1[1].split('x')[0], c1[1].split('x')[1][:-1]])
-    print(xc, yc, w, h)
     return xc, yc, w, h
 
 def get_coords(wcs, xc, yc, w, h):
@@ -53,7 +50,7 @@ def get_coords(wcs, xc, yc, w, h):
 
 def get_brick(ra,dec,rac,decc):
     inside = []
-    for i in glob.glob('footprints/F160W_??_footprint.txt'):
+    for i in glob.glob('footprints/F160W_*_footprint.txt'):
         fp = np.loadtxt(i,unpack=True)
         path = mplPath.Path(fp.T)
         radec = np.asarray([ra,dec]).T
@@ -66,7 +63,7 @@ def get_brick(ra,dec,rac,decc):
         for j in range(2, 6):
             if list(where).count(i) == j:
                 ndict[str(j)].append(brick)
-    bricks = None
+    brick = None
     for i in range(2, 6):
         n = str(7-i)
         if len(ndict[n]) > 0:
@@ -109,7 +106,7 @@ def plotcmd(t, cpath, blue='f475w', red='f814w', y='f814w'):
                          contour_args={'cmap':'viridis'})
     levels = sc[-1].levels
     labels = ['{:.0f}'.format(l) for l in levels]
-    cb = fig.colorbar(sc[-1], label='Number of stars')
+    cb = fig.colorbar(sc[-1], label='Star density')
     cb.set_ticklabels(labels)
     ax.set_xlim(xl)
     ax.set_ylim(yl)

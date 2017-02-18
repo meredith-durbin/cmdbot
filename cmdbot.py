@@ -17,20 +17,27 @@ def run():
 
     statuses = api.GetUserTimeline(user_id=2990633947, screen_name='AndromedaBot')
     most_recent = statuses[0].AsDict()
-    status_id = str(most_recent[u'id'])
-    new_tweet = check_new_tweet(status_id)
+    status_id = most_recent[u'id']
+    new_tweet = check_new_tweet(str(status_id))
 
     if new_tweet:
-        txt = most_recent['text']
+        print('New @AndromedaBot tweet found!')
+        txt = most_recent['text'].split(' http')[0]
         wcs = get_wcs('m31avm.xml')
         pix = get_pix(txt)
         coords = get_coords(wcs, *pix)
         brick = get_brick(*coords)
         print('Brick {}'.format(brick))
-        cpath = get_cpath(coords)
-        t = read_table(brick)
-        print('Stars in full table: {}'.format(len(t)))
-        plotcmd(t, cpath)
+        if brick is not None:
+            cpath = get_cpath(coords)
+            t = read_table(brick)
+            print('Stars in full table: {}'.format(len(t)))
+            plotcmd(t, cpath)
+            api.PostUpdate('.@AndromedaBot: "{}"'.format(txt),
+                media='cmd.png', in_reply_to_status_id=status_id)
+            print('Tweet posted')
+    else:
+        print('No new @AndromedaBot tweets found.')
 
 if __name__ == '__main__':
     run()
