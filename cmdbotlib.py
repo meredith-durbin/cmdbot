@@ -7,6 +7,7 @@ import glob
 import numpy as np
 import os
 from astroML.plotting import scatter_contour
+from astropy.coordinates import SkyCoord
 from astropy.table import Table
 from pyavm import AVM
 from aesthetics import aestheticize
@@ -34,21 +35,20 @@ def get_wcs(avmfile):
 
 def get_pix(pxstr):
     c1 = pxstr.split(': ')[1].split('. ')
-    xc,yc = map(float, c1[0].split(','))
+    x,y = map(float, c1[0].split(','))
     w,h = map(float, [c1[1].split('x')[0], c1[1].split('x')[1][:-1]])
-    return xc, yc, w, h
+    return x, y, w, h
 
 def get_coords(wcs, xc, yc, w, h):
-    rac,decc = wcs.all_pix2world(xc,yc,0)
-    ra0,dec0 = wcs.all_pix2world(xc-w/2,yc-w/2,0)
-    ra1,dec1 = wcs.all_pix2world(xc-w/2,yc+w/2,0)
-    ra2,dec2 = wcs.all_pix2world(xc+w/2,yc+w/2,0)
-    ra3,dec3 = wcs.all_pix2world(xc+w/2,yc-w/2,0)
+    ra0,dec0 = wcs.all_pix2world(xc,yc,0)
+    ra1,dec1 = wcs.all_pix2world(xc,yc+w,0)
+    ra2,dec2 = wcs.all_pix2world(xc+w,yc+w,0)
+    ra3,dec3 = wcs.all_pix2world(xc+w,yc,0)
     ra = np.hstack([ra0,ra1,ra2,ra3,ra0])
     dec = np.hstack([dec0,dec1,dec2,dec3,dec0])
-    return ra, dec, rac, decc
+    return ra, dec
 
-def get_brick(ra,dec,rac,decc):
+def get_brick(ra,dec):
     inside = []
     for i in glob.glob('footprints/F160W_*_footprint.txt'):
         fp = np.loadtxt(i,unpack=True)
@@ -82,7 +82,7 @@ def read_table(brick):
     t = Table.read(table)
     return t
 
-def plotcmd(t, cpath, blue='f475w', red='f814w', y='f814w'):
+def plotcmd(t, cpath, txt, blue='f475w', red='f814w', y='f814w'):
     aestheticize()
     f1 = blue.lower() + '_vega'
     f2 = red.lower() + '_vega'
@@ -95,7 +95,7 @@ def plotcmd(t, cpath, blue='f475w', red='f814w', y='f814w'):
     t_cut = t[inpath & t[g1] & t[g2] & (t[f1] < 99) & (t[f2] < 99)]
     if len(t_cut) == 0:
         raise Exception('Empty table.')
-    fig, ax = plt.subplots(1,1,figsize=(6,4))
+    fig, ax = plt.subplots(1,1,figsize=(6,4.5))
     ax.plot(t_cut[f1]-t_cut[f2],t_cut[f3],'k.',ms=4, alpha=0.)
     xl = ax.get_xlim()
     yl = ax.get_ylim()
@@ -105,14 +105,19 @@ def plotcmd(t, cpath, blue='f475w', red='f814w', y='f814w'):
                          histogram2d_args={'bins':40},
                          contour_args={'cmap':'viridis', 'zorder':100})
     levels = sc[-1].levels
-    labels = ['{:.0f}'.format(l) for l in levels]
-    cb = fig.colorbar(sc[-1], label='Star density')
+    labels = ['Fewer\nstars','More\nstars']
+    cb = fig.colorbar(sc[-1])
+    cb.set_ticks([levels[0],levels[-1]])
     cb.set_ticklabels(labels)
     ax.set_xlim(xl)
     ax.set_ylim(yl)
     ax.invert_yaxis()
     ax.set_xlabel('{} - {}'.format(blue.upper(), red.upper()))
     ax.set_ylabel('{}'.format(y.upper()))
+    title_str = txt.split(': ')[1].split('. ')[0]
+    coo = SkyCoord(*cpath.vertices[0],unit='deg')
+    coo_str = coo.to_string('hmsdms')
+    ax.set_title('{} ({})'.format(title_str, coo_str))
     fig.tight_layout()
-    fig.set_dpi(144)
-    fig.savefig('cmd.png', dpi=144)
+    fig.set_dpi(300)
+    fig.savefig('cmd.png', dpi=300)

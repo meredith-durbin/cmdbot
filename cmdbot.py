@@ -31,8 +31,7 @@ def run():
         if brick is not None:
             cpath = get_cpath(coords)
             t = read_table(brick)
-            print('Stars in full table: {}'.format(len(t)))
-            plotcmd(t, cpath)
+            plotcmd(t, cpath, txt)
             api.PostUpdate('.@AndromedaBot: "{}"'.format(txt),
                 media='cmd.png', in_reply_to_status_id=status_id)
             print('Tweet posted')
