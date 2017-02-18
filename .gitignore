@@ -3,6 +3,9 @@ hlsp/
 extra/
 *.ipynb
 *DS_Store
+cmd.png
+footprints/
+most_recent.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
