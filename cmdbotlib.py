@@ -94,6 +94,8 @@ def plotcmd(t, cpath, blue='f475w', red='f814w', y='f814w'):
     g2 = red.lower() + '_gst'
     inpath = cpath.contains_points(np.array([t['ra'],t['dec']]).astype(float).T)
     t_cut = t[inpath & t[g1] & t[g2] & (t[f1] < 99) & (t[f2] < 99)]
+    if len(t_cut) == 0:
+        raise Exception('Empty table.')
     fig, ax = plt.subplots(1,1,figsize=(6,4))
     ax.plot(t_cut[f1]-t_cut[f2],t_cut[f3],'k.',ms=4, alpha=0.)
     xl = ax.get_xlim()
