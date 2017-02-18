@@ -26,8 +26,10 @@ def run():
         pix = get_pix(txt)
         coords = get_coords(wcs, *pix)
         brick = get_brick(*coords)
+        print('Brick {}'.format(brick))
         cpath = get_cpath(coords)
         t = read_table(brick)
+        print('Stars in full table: {}'.format(len(t)))
         plotcmd(t, cpath)
 
 if __name__ == '__main__':

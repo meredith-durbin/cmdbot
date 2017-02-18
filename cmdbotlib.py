@@ -93,6 +93,8 @@ def plotcmd(t, cpath, blue='f475w', red='f814w', y='f814w'):
     g1 = blue.lower() + '_gst'
     g2 = red.lower() + '_gst'
     inpath = cpath.contains_points(np.array([t['ra'],t['dec']]).astype(float).T)
+    if not (True in inpath):
+        raise Exception('Nothing found in image region.')
     t_cut = t[inpath & t[g1] & t[g2] & (t[f1] < 99) & (t[f2] < 99)]
     if len(t_cut) == 0:
         raise Exception('Empty table.')
