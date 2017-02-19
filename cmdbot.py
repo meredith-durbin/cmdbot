@@ -35,11 +35,12 @@ def run():
             result = None
             while result is None:
                 for brick in bricks:
+                    print('Trying brick {}'.format(brick))
                     try:
                         t = read_table(brick)
                         plotcmd(t, cpath, txt)
                         result = True
-                    except Exception:
+                    except:
                         print("Brick {} didn't work. Trying another.".format(brick))
                         if bricks.index(brick) == (len(bricks) - 1):
                             result = False
