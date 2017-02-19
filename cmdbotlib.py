@@ -59,7 +59,6 @@ def get_brick(ra,dec):
         for j in range(2, 6):
             if list(where).count(i) == j:
                 ndict[str(j)].append(brick)
-    print(ndict)
     brick = None
     for i in range(2, 6):
         n = str(7-i)

@@ -17,6 +17,7 @@ def run():
 
     statuses = api.GetUserTimeline(user_id=2990633947, screen_name='AndromedaBot')
     most_recent = statuses[0].AsDict()
+    print('Most recent tweet: {}'.format(most_recent[u'created_at']))
     status_id = most_recent[u'id']
     recentfile = 'most_recent.txt'
     new_tweet = check_new_tweet(str(status_id), recentfile)
