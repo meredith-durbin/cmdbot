@@ -40,9 +40,9 @@ def run():
                         result = True
                     except Exception:
                         print("Brick {} didn't work. Trying another.".format(brick))
-                    if bricks.index(brick) == (len(bricks) - 1):
-                        result = False
-                        print("Couldn't find photometry. Sorry!")
+                        if bricks.index(brick) == (len(bricks) - 1):
+                            result = False
+                            print("Couldn't find photometry. Sorry!")
             if result != False:
                 api.PostUpdate('.@AndromedaBot: "{}"'.format(txt),
                     media='cmd.png', in_reply_to_status_id=status_id)
