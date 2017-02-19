@@ -40,6 +40,7 @@ def run():
                         t = read_table(brick)
                         plotcmd(t, cpath, txt)
                         result = True
+                        break
                     except:
                         print("Brick {} didn't work. Trying another.".format(brick))
                         if bricks.index(brick) == (len(bricks) - 1):
