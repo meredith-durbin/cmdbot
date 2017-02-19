@@ -12,20 +12,16 @@ from astropy.table import Table
 from pyavm import AVM
 from aesthetics import aestheticize
 
-def check_new_tweet(status_id, recentfile='most_recent.txt'):
-    if os.path.exists(recentfile):
+def check_new_tweet(status_id, recentfile):
+    if os.path.isfile(recentfile):
         with open(recentfile) as f:
             prev_id = f.read()
         if status_id == prev_id:
             new_tweet = False
         elif status_id != prev_id:
             new_tweet = True
-            with open(recentfile,'w') as f:
-                f.write(status_id)
     else:
         new_tweet = True
-        with open(recentfile,'w') as f:
-            f.write(status_id)
     return new_tweet
 
 def get_wcs(avmfile):
@@ -63,13 +59,14 @@ def get_brick(ra,dec):
         for j in range(2, 6):
             if list(where).count(i) == j:
                 ndict[str(j)].append(brick)
+    print(ndict)
     brick = None
     for i in range(2, 6):
         n = str(7-i)
         if len(ndict[n]) > 0:
-            brick = ndict[n][0]
+            bricks = ndict[n]
             break
-    return brick
+    return bricks
 
 def get_cpath(coords):
     cpath = mplPath.Path(np.array([coords[0],coords[1]]).T)
