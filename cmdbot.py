@@ -41,7 +41,7 @@ def run():
                         plotcmd(t, cpath, txt)
                         result = True
                         break
-                    except:
+                    except Exception:
                         print("Brick {} didn't work. Trying another.".format(brick))
                         if bricks.index(brick) == (len(bricks) - 1):
                             result = False
