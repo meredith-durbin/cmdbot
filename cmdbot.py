@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-import twitter
+from twitter import Twitter, OAuth
 import auth
 
 from cmdbotlib import check_new_tweet
@@ -9,13 +9,12 @@ from cmdbotlib import get_wcs, get_pix, get_coords, get_cpath
 from cmdbotlib import plotcmd
 
 def run():
-    api = twitter.Api(consumer_key        = auth.CONSUMER_KEY,
-                      consumer_secret     = auth.CONSUMER_SECRET,
-                      access_token_key    = auth.ACCESS_TOKEN,
-                      access_token_secret = auth.ACCESS_TOKEN_SECRET)
+    oauth = OAuth(auth.ACCESS_TOKEN, auth.ACCESS_TOKEN_SECRET,
+                  auth.CONSUMER_KEY, auth.CONSUMER_SECRET)
+    api = Twitter(auth=oauth)
 
-    statuses = api.GetUserTimeline(user_id=2990633947, screen_name='AndromedaBot')
-    most_recent = statuses[0].AsDict()
+    statuses = api.statuses.user_timeline(user_id=2990633947, screen_name='AndromedaBot')
+    most_recent = statuses[0]
     print('Most recent tweet: {}'.format(most_recent[u'created_at']))
     status_id = most_recent[u'id']
     recentfile = 'most_recent.txt'
@@ -35,8 +34,12 @@ def run():
         except Exception:
             print("Something borked. Sorry!")
         if result:
-            api.PostUpdate('.@AndromedaBot: "{}"'.format(txt),
-                media='cmd.png', in_reply_to_status_id=status_id)
+            with open("cmd.png", "rb") as imagefile:
+                imagedata = imagefile.read()
+            t_upload = Twitter(domain='upload.twitter.com', auth=oauth)
+            img_id = t_upload.media.upload(media=imagedata)["media_id_string"]
+            api.statuses.update(status='.@AndromedaBot: "{}"'.format(txt),
+                media_ids=img_id, in_reply_to_status_id=status_id)
             print('Tweet posted')
             with open(recentfile,'w') as f:
                 f.write(str(status_id))
